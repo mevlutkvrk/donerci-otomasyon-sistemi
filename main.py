@@ -28,9 +28,16 @@ class DonerciApp(QMainWindow, Ui_MainWindow):
         self.btn_analiz_yenile.clicked.connect(self.analizi_yukle)
         
     def baglanti_kur(self):
+        try:
+            client = pymongo.MongoClient("mongodb://localhost:27017/")
+            self.db = client["DonerciDB"]
 
-        client = pymongo.MongoClient("mongodb://localhost:27017/")
-        self.db = client["DonerciDB"]
+        except pymongo.errors.ServerSelectionTimeoutError:
+            QMessageBox.critical(self, "Hata!", "Veritabanına bağlanılamadı!\nLütfen MongoDB'nin çalıştığından emin olun.")
+            sys.exit()
+            
+        except Exception as e:
+            QMessageBox.warning(self, "Hata!", f"Beklenmedik bir hata oluştu: {str(e)}")
 
     def menuyu_yukle(self):
         self.menu_alani.setFixedWidth(240)
